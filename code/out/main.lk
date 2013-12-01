@@ -1,5 +1,5 @@
 -muwx
--i ./out/main.ihx
+-i out/main.ihx
 -M
 -Y
 -b HOME = 0x0000
@@ -12,6 +12,6 @@
 -l libint
 -l liblong
 -l libfloat
-./out/main.rel
+out/main.rel
 
 -e
