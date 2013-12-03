@@ -230,7 +230,7 @@ Symbol Table
     _C_T2                                                       =  00C9 G
     _DPH                                                        =  0083 G
     _DPL                                                        =  0082 G
- 18 _DisplayGLCD                                                   0044 GR
+ 18 _DisplayGLCD                                                   0061 GR
     _EA                                                         =  00AF G
     _EBO                                                        =  00EB G
     _EC                                                         =  00AE G
@@ -250,15 +250,15 @@ Symbol Table
     _F1                                                         =  00D1 G
     _FCF                                                        =  00B1 G
     _FST                                                        =  00B6 G
- 18 _Get_DS1307_RTC_Date                                           088B GR
- 18 _Get_DS1307_RTC_Time                                           07A1 GR
- 18 _I2C_ReStart                                                   045A GR
- 18 _I2C_Read_Byte                                                 052C GR
- 18 _I2C_Send_ACK                                                  049A GR
- 18 _I2C_Send_NACK                                                 04B2 GR
- 18 _I2C_Start                                                     0448 GR
- 18 _I2C_Stop                                                      047A GR
- 18 _I2C_Write_Byte                                                04CA GR
+ 18 _Get_DS1307_RTC_Date                                           0A6F GR
+ 18 _Get_DS1307_RTC_Time                                           0985 GR
+ 18 _I2C_ReStart                                                   063E GR
+ 18 _I2C_Read_Byte                                                 0710 GR
+ 18 _I2C_Send_ACK                                                  067E GR
+ 18 _I2C_Send_NACK                                                 0696 GR
+ 18 _I2C_Start                                                     062C GR
+ 18 _I2C_Stop                                                      065E GR
+ 18 _I2C_Write_Byte                                                06AE GR
     _IE                                                         =  00A8 G
     _IE0                                                        =  0089 G
     _IE1                                                        =  008B G
@@ -273,8 +273,9 @@ Symbol Table
     _IP1H                                                       =  00F7 G
     _IT0                                                        =  0088 G
     _IT1                                                        =  008A G
- 18 _InitGLCDEnvironment                                           0000 GR
- 18 _InitI2C                                                       0443 GR
+ 18 _InitGLCDEnvironment                                           001D GR
+ 18 _InitI2C                                                       0627 GR
+ 19 _Line                                                          0681 GR
     _OV                                                         =  00D2 G
     _P                                                          =  00D0 G
     _P0                                                         =  0080 G
@@ -297,11 +298,11 @@ Symbol Table
     _P1_7                                                       =  0097 G
     _P2                                                         =  00A0 G
     _P2_0                                                       =  00A0 G
-    _P2_1                                                       =  00A1 G
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 6.
 
 Symbol Table
 
+    _P2_1                                                       =  00A1 G
     _P2_2                                                       =  00A2 G
     _P2_3                                                       =  00A3 G
     _P2_4                                                       =  00A4 G
@@ -337,12 +338,12 @@ Symbol Table
     _RS0                                                        =  00D3 G
     _RS1                                                        =  00D4 G
     _RXD                                                        =  00B0 G
- 18 _Read_Byte_From_DS1307_RTC                                     05C1 GR
+ 18 _Read_Byte_From_DS1307_RTC                                     07A5 GR
   A _Read_Byte_From_DS1307_RTC_sloc0_1_0                           0001 R
- 18 _Read_Bytes_From_DS1307_RTC                                    0674 GR
-  5 _Read_Bytes_From_DS1307_RTC_PARM_2                             001C GR
-  5 _Read_Bytes_From_DS1307_RTC_PARM_3                             001F GR
-  5 _Read_Bytes_From_DS1307_RTC_i_1_108                            0021 R
+ 18 _Read_Bytes_From_DS1307_RTC                                    0858 GR
+  5 _Read_Bytes_From_DS1307_RTC_PARM_2                             0022 GR
+  5 _Read_Bytes_From_DS1307_RTC_PARM_3                             0025 GR
+  5 _Read_Bytes_From_DS1307_RTC_i_1_123                            0027 R
   A _Read_Bytes_From_DS1307_RTC_sloc0_1_0                          0003 R
     _SADDR                                                      =  00A9 G
     _SADEN                                                      =  00B9 G
@@ -357,22 +358,22 @@ Symbol Table
     _SPCFG                                                      =  00AA G
     _SPCR                                                       =  00D5 G
     _SPCTL                                                      =  00D5 G
-    _SPDAT                                                      =  0086 G
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 7.
 
 Symbol Table
 
+    _SPDAT                                                      =  0086 G
     _SPDR                                                       =  0086 G
     _SPSR                                                       =  00AA G
     _SWDT                                                       =  00C0 G
- 18 _Set_DS1307_RTC_Date                                           0825 GR
-  5 _Set_DS1307_RTC_Date_PARM_2                                    0026 GR
-  5 _Set_DS1307_RTC_Date_PARM_3                                    0027 GR
-  5 _Set_DS1307_RTC_Date_PARM_4                                    0028 GR
- 18 _Set_DS1307_RTC_Time                                           0735 GR
-  5 _Set_DS1307_RTC_Time_PARM_2                                    0023 GR
-  5 _Set_DS1307_RTC_Time_PARM_3                                    0024 GR
-  5 _Set_DS1307_RTC_Time_PARM_4                                    0025 GR
+ 18 _Set_DS1307_RTC_Date                                           0A09 GR
+  5 _Set_DS1307_RTC_Date_PARM_2                                    002C GR
+  5 _Set_DS1307_RTC_Date_PARM_3                                    002D GR
+  5 _Set_DS1307_RTC_Date_PARM_4                                    002E GR
+ 18 _Set_DS1307_RTC_Time                                           0919 GR
+  5 _Set_DS1307_RTC_Time_PARM_2                                    0029 GR
+  5 _Set_DS1307_RTC_Time_PARM_3                                    002A GR
+  5 _Set_DS1307_RTC_Time_PARM_4                                    002B GR
     _T0                                                         =  00B4 G
     _T1                                                         =  00B5 G
     _T2CON                                                      =  00C8 G
@@ -403,7 +404,7 @@ Symbol Table
     _TR1                                                        =  008E G
     _TR2                                                        =  00CA G
     _TXD                                                        =  00B1 G
-  5 _Temp                                                          0016 GR
+  5 _Temp                                                          001C GR
     _WDOUT                                                      =  00C4 G
     _WDRE                                                       =  00C3 G
     _WDT                                                        =  00C1 G
@@ -411,18 +412,18 @@ Symbol Table
     _WDTD                                                       =  0085 G
     _WDTS                                                       =  00C2 G
     _WR                                                         =  00B6 G
- 18 _Write_Byte_To_DS1307_RTC                                      058F GR
-  5 _Write_Byte_To_DS1307_RTC_PARM_2                               0017 GR
+ 18 _Write_Byte_To_DS1307_RTC                                      0773 GR
+  5 _Write_Byte_To_DS1307_RTC_PARM_2                               001D GR
   A _Write_Byte_To_DS1307_RTC_sloc0_1_0                            0000 R
- 18 _Write_Bytes_To_DS1307_RTC                                     0612 GR
-  5 _Write_Bytes_To_DS1307_RTC_PARM_2                              0018 GR
-  5 _Write_Bytes_To_DS1307_RTC_PARM_3                              001B GR
-  A _Write_Bytes_To_DS1307_RTC_sloc0_1_0                           0002 R
+ 18 _Write_Bytes_To_DS1307_RTC                                     07F6 GR
+  5 _Write_Bytes_To_DS1307_RTC_PARM_2                              001E GR
+  5 _Write_Bytes_To_DS1307_RTC_PARM_3                              0021 GR
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 8.
 
 Symbol Table
 
- 18 ___delay_us                                                    0423 GR
+  A _Write_Bytes_To_DS1307_RTC_sloc0_1_0                           0002 R
+ 18 ___delay_us                                                    0607 GR
     __divslong                                                     **** GX
     __divslong_PARM_2                                              **** GX
     __divuint                                                      **** GX
@@ -438,37 +439,50 @@ Symbol Table
     __sdcc_gsinit_startup                                          **** GX
   F __sdcc_program_startup                                         0003 GR
   7 __start__stack                                                 0000 GR
- 19 __str_0                                                        059B R
- 19 __str_1                                                        05AC R
- 19 __str_2                                                        05B9 R
- 18 _beginScreen                                                   03FC GR
-  5 _ch_CharCatch                                                  0029 GR
- 18 _chipSelectGLCD                                                0054 GR
- 18 _clearGLCD                                                     0082 GR
- 18 _commandGLCD                                                   0031 GR
+ 18 _beginScreen                                                   05FD GR
+ 18 _borders                                                       04DE GR
+  5 _borders_PARM_2                                                0012 GR
+  5 _borders_PARM_3                                                0014 GR
+  5 _borders_PARM_4                                                0016 GR
+ 19 _bottomLeftCorner                                              0686 GR
+ 19 _bottomRightCorner                                             0684 GR
+  5 _ch_CharCatch                                                  002F GR
+ 18 _chipSelectGLCD                                                0071 GR
+ 18 _clearGLCD                                                     009F GR
+ 18 _commandGLCD                                                   004E GR
   5 _commandGLCD_PARM_2                                            0000 GR
- 18 _delay                                                         0578 GR
- 18 _delayms                                                       0406 GR
- 18 _getCharLen                                                    0BF2 GR
+ 18 _delay                                                         075C GR
+ 18 _delayms                                                       0000 GR
+ 18 _getCharLen                                                    0AFF GR
  19 _glcdCharSystemFont                                            0028 GR
  19 _glcdNumberSystemFont                                          0000 GR
  19 _glcdSmallCharSystemFont                                       00DE GR
-  5 _i                                                             002C GR
- 18 _main                                                          08E0 GR
-  5 _nVar                                                          002E GR
-  5 _pRTCArray                                                     0012 GR
- 18 _printDigit                                                    010A GR
- 18 _printNumber                                                   0227 GR
-  5 _printNumber_cChar_1_41                                        0005 R
-  5 _printNumber_cInteger_1_41                                     0006 R
-  5 _printNumber_lNumber_1_40                                      0001 R
- 18 _setGLCDCursor                                                 02ED GR
+  5 _i                                                             0032 GR
+ 19 _largeLcdChar_Zero                                             05FD GR
+ 18 _main                                                          0AC4 GR
+  5 _nVar                                                          0034 GR
+ 19 _nameLogo                                                      038C GR
+  5 _pRTCArray                                                     0018 GR
+ 18 _printDigit                                                    0127 GR
+ 18 _printNumber                                                   0244 GR
+  5 _printNumber_cChar_1_45                                        0005 R
+  5 _printNumber_cInteger_1_45                                     0006 R
+  5 _printNumber_lNumber_1_44                                      0001 R
+ 18 _setGLCDCursor                                                 030A GR
   5 _setGLCDCursor_PARM_2                                          0010 GR
- 18 _splashImage                                                   036A GR
+ 18 _showGLCDTime                                                  0553 GR
+ 18 _splashImage                                                   038B GR
+ 19 _topLeftCorner                                                 067F GR
+ 19 _topRightCorner                                                0682 GR
+ 19 _upperLine                                                     067E GR
  19 _welcomeScreenImage                                            019B GR
- 18 _writeGLCD                                                     0049 GR
- 18 _writeLetter                                                   013C GR
- 18 _writeLine                                                     00DF GR
+ 18 _writeGLCD                                                     0066 GR
+ 18 _writeLetter                                                   0159 GR
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 9.
+
+Symbol Table
+
+ 18 _writeLine                                                     00FC GR
     a                                                           =  00E0 L
     a.0                                                         =  00E0 L
     a.1                                                         =  00E1 L
@@ -478,10 +492,6 @@ Symbol Table
     a.5                                                         =  00E5 L
     a.6                                                         =  00E6 L
     a.7                                                         =  00E7 L
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 9.
-
-Symbol Table
-
     ac                                                          =  00D6 L
     acc                                                         =  00E0 L
     acc.0                                                       =  00E0 L
@@ -528,6 +538,10 @@ Symbol Table
     ie.0                                                        =  00A8 L
     ie.1                                                        =  00A9 L
     ie.2                                                        =  00AA L
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 10.
+
+Symbol Table
+
     ie.3                                                        =  00AB L
     ie.4                                                        =  00AC L
     ie.5                                                        =  00AD L
@@ -538,10 +552,6 @@ Symbol Table
     int1                                                        =  00B3 L
     ip                                                          =  00B8 L
     ip.0                                                        =  00B8 L
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 10.
-
-Symbol Table
-
     ip.1                                                        =  00B9 L
     ip.2                                                        =  00BA L
     ip.3                                                        =  00BB L
@@ -588,6 +598,10 @@ Symbol Table
     p3.6                                                        =  00B6 L
     p3.7                                                        =  00B7 L
     pcon                                                        =  0087 L
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 11.
+
+Symbol Table
+
     ps                                                          =  00BC L
     psw                                                         =  00D0 L
     psw.0                                                       =  00D0 L
@@ -598,10 +612,6 @@ Symbol Table
     psw.5                                                       =  00D5 L
     psw.6                                                       =  00D6 L
     psw.7                                                       =  00D7 L
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 11.
-
-Symbol Table
-
     pt0                                                         =  00B9 L
     pt1                                                         =  00BB L
     pt2                                                         =  00BD L
@@ -648,6 +658,10 @@ Symbol Table
     tcon.3                                                      =  008B L
     tcon.4                                                      =  008C L
     tcon.5                                                      =  008D L
+ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 12.
+
+Symbol Table
+
     tcon.6                                                      =  008E L
     tcon.7                                                      =  008F L
     tf0                                                         =  008D L
@@ -658,10 +672,6 @@ Symbol Table
     th2                                                         =  00CD L
     ti                                                          =  0099 L
     tl0                                                         =  008A L
-ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 12.
-
-Symbol Table
-
     tl1                                                         =  008B L
     tl2                                                         =  00CC L
     tmod                                                        =  0089 L
@@ -669,7 +679,6 @@ Symbol Table
     tr1                                                         =  008E L
     tr2                                                         =  00CA L
     txd                                                         =  00B1 L
-
 
 ASxxxx Assembler V02.00 + NoICE + SDCC mods  (Intel 8051), page 13.
 
@@ -680,7 +689,7 @@ Area Table
    2 RSEG0                                      size    0   flags    8
    3 RSEG1                                      size    0   flags    8
    4 REG_BANK_0                                 size    8   flags    4
-   5 DSEG                                       size   30   flags    0
+   5 DSEG                                       size   36   flags    0
    6 OSEG                                       size    0   flags    4
    7 SSEG                                       size    1   flags    0
    8 ISEG                                       size    0   flags    0
@@ -699,8 +708,8 @@ Area Table
   15 GSINIT5                                    size    0   flags   20
   16 GSINIT                                     size    0   flags   20
   17 GSFINAL                                    size    3   flags   20
-  18 CSEG                                       size  C25   flags   20
-  19 CONST                                      size  5BB   flags   20
+  18 CSEG                                       size  B32   flags   20
+  19 CONST                                      size  688   flags   20
   1A XINIT                                      size    0   flags   20
   1B CABS                                       size    0   flags   28
 

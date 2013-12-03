@@ -5,9 +5,9 @@
 
 //include files goes here
 #include "./../inc/main.h"
+#include "libdelay.c"
 #include "glcd.c"
 #include "screen.c"
-#include "libdelay.c"
 #include "I2C.c"
 #include "DS1307.c"
 
@@ -32,12 +32,15 @@ void main(){
 	//show a slpash screen.
 	splashImage();
 
-	//give a delay
-	delayms( 1000 );
-
-	//clear the display now...
+	//give a delay	
+	borders( '1', 0, 2, 127);				//draw borders of the screen
+	delayms( 3000 );
+	
 	clearGLCD();
-
+	showGLCDTime();			//from glcd lib.
+	
+	
+	/*
 	setGLCDCursor( 1, 1);
 	
 	writeLine( "Detecting clock." );
@@ -54,9 +57,9 @@ void main(){
 	setGLCDCursor( 1, 2);
 	writeLine("In loop now.");
 	delayms( 2000 );
-	
+	*/
 	while( 1 ){
-	
+	/*
 		clearGLCD();
 		setGLCDCursor( 0, 0);
 		ch_CharCatch = Get_DS1307_RTC_Time();
@@ -95,6 +98,7 @@ void main(){
 		
 		
 		delayms( 1000 );
+		*/
 	}
 }
 

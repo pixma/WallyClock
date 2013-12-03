@@ -123,33 +123,118 @@ void printNumber( long lNumber){
 
 void setGLCDCursor( int x, int y)
 {
-	if( x>=0 && x<8 ){
+	if( x>=0 && x<=63 ){
 		chipSelectGLCD( 1 );
 		commandGLCD( PAGE0+ y, 1 ); //page n base address...
 		commandGLCD( COLUMN_ADDRESS + x, 1 );	//column base address.
 	}
-	else if ( x>7 && x <16 ){
+	else if ( x>63 && x <128 ){
 		chipSelectGLCD( 2 );
 		commandGLCD( PAGE0+ y, 2 ); //page n base address...
-		commandGLCD( COLUMN_ADDRESS + x, 2 );	//column base address.
+		commandGLCD( COLUMN_ADDRESS + (x - 63), 2 );	//column base address.
 	}
 }
+
 
 void splashImage( ){
 	unsigned char i,pg;
-	
-	for(pg=0;pg<8;pg++)
-	{		
-		setGLCDCursor( 0, pg );
-		for(i=0;i<=63;i++)
-		{		
-			DisplayGLCD(welcomeScreenImage[pg][i]);	
+	int j=0;
+	chipSelectGLCD( 1 );
+	setGLCDCursor( 0, 0 );
+	for(pg=0;pg<2;pg++)
+	{				
+		for(i=0;i<128;i++)
+		{	
+			
+			DisplayGLCD(welcomeScreenImage[j]);	
+			j++;
+			if( i >= 63 ){
+				//chipSelectGLCD( 2 );				
+				setGLCDCursor( i, pg );
+			}			
 		}
-		setGLCDCursor( 8, pg );
-		for(i=64;i<128;i++)
-		{		
-			DisplayGLCD(welcomeScreenImage[pg][i]);	
+		chipSelectGLCD ( 1 );
+		setGLCDCursor( 0, pg + 1 );		
+	}
+	
+	
+	chipSelectGLCD( 1 );
+	setGLCDCursor( 0, 4);
+	
+	j = 0;
+	for(pg=4;pg<7;pg++)
+	{				
+		for(i=0;i<128;i++)
+		{	
+			
+			DisplayGLCD(nameLogo[j]);	
+			j++;
+			if( i >= 63 ){
+				//chipSelectGLCD( 2 );				
+				setGLCDCursor( i, pg );
+			}			
+		}
+		chipSelectGLCD ( 1 );
+		setGLCDCursor( 0, pg + 1 );		
+	}
+}
+
+void borders (char ch, int x, int y, int len){
+	
+	unsigned char i, bolType = 0;
+	switch ( ch ){
+		case '1':
+		// Upper straight Line		
+		chipSelectGLCD( 1 );
+		setGLCDCursor( x, y );
+		for( i=0 ; i <  len ; i ++ ){
+			if ( i >= 63 ){
+				chipSelectGLCD( 2 );
+				if( bolType == 0 ){
+					setGLCDCursor( 64, y );
+					bolType = 1;
+				}
+			}
+			
+			DisplayGLCD( upperLine[0] );					
+		}
+		break;
+	}
+	/* chipSelectGLCD( 1 );
+	setGLCDCursor( 0, 0 );
+	for( i=0 ; i <  128 ; i ++ ){
+		DisplayGLCD( upperLine[0] );		
+		if ( i >= 63 ){
+			chipSelectGLCD( 2 );
 		}
 	}
-
+	setGLCDCursor( 63, 0 );
+	
+	for( i = 0; i < 8; i ++ ){
+			DisplayGLCD( Line [0] );
+			setGLCDCursor( 63, i );
+	} */
 }
+
+//shows time on bigger font size.
+void showGLCDTime( ){
+
+	unsigned char i;
+	int col = 0;
+	chipSelectGLCD( 1 );
+	setGLCDCursor( 0, 0);
+	for( i = 0; i <=128 ; i ++){
+		DisplayGLCD(largeLcdChar_Zero[i]);
+		if( i % 26 == 0){
+			setGLCDCursor( 0 , ++col);
+		}
+	}
+	setGLCDCursor( 26, 0 );
+	col = 0;
+	for( i = 0; i <=128 ; i ++){
+		DisplayGLCD(largeLcdChar_Zero[i]);
+		if( i % 26 == 0){
+			setGLCDCursor( 26 , ++col);
+		}
+	}	
+}	

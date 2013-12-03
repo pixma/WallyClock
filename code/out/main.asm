@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
 ; Version 3.3.0 #8604 (May 11 2013) (Linux)
-; This file was generated Sun Dec  1 19:12:49 2013
+; This file was generated Tue Dec  3 18:01:19 2013
 ;--------------------------------------------------------
 	.module main
 	.optsdcc -mmcs51 --model-small
@@ -9,11 +9,20 @@
 ;--------------------------------------------------------
 ; Public variables in this module
 ;--------------------------------------------------------
+	.globl _bottomLeftCorner
+	.globl _bottomRightCorner
+	.globl _topRightCorner
+	.globl _Line
+	.globl _topLeftCorner
+	.globl _upperLine
+	.globl _largeLcdChar_Zero
+	.globl _nameLogo
 	.globl _welcomeScreenImage
 	.globl _glcdSmallCharSystemFont
 	.globl _glcdCharSystemFont
 	.globl _glcdNumberSystemFont
 	.globl _main
+	.globl _showGLCDTime
 	.globl _SCK
 	.globl _SDA
 	.globl _TF2
@@ -207,8 +216,12 @@
 	.globl _Write_Byte_To_DS1307_RTC_PARM_2
 	.globl _Temp
 	.globl _pRTCArray
+	.globl _borders_PARM_4
+	.globl _borders_PARM_3
+	.globl _borders_PARM_2
 	.globl _setGLCDCursor_PARM_2
 	.globl _commandGLCD_PARM_2
+	.globl _delayms
 	.globl _InitGLCDEnvironment
 	.globl _commandGLCD
 	.globl _DisplayGLCD
@@ -221,8 +234,8 @@
 	.globl _printNumber
 	.globl _setGLCDCursor
 	.globl _splashImage
+	.globl _borders
 	.globl _beginScreen
-	.globl _delayms
 	.globl ___delay_us
 	.globl _InitI2C
 	.globl _I2C_Start
@@ -440,13 +453,19 @@ _SCK	=	0x0091
 	.area DSEG    (DATA)
 _commandGLCD_PARM_2:
 	.ds 1
-_printNumber_lNumber_1_40:
+_printNumber_lNumber_1_44:
 	.ds 4
-_printNumber_cChar_1_41:
+_printNumber_cChar_1_45:
 	.ds 1
-_printNumber_cInteger_1_41:
+_printNumber_cInteger_1_45:
 	.ds 10
 _setGLCDCursor_PARM_2:
+	.ds 2
+_borders_PARM_2:
+	.ds 2
+_borders_PARM_3:
+	.ds 2
+_borders_PARM_4:
 	.ds 2
 _pRTCArray::
 	.ds 4
@@ -462,7 +481,7 @@ _Read_Bytes_From_DS1307_RTC_PARM_2:
 	.ds 3
 _Read_Bytes_From_DS1307_RTC_PARM_3:
 	.ds 2
-_Read_Bytes_From_DS1307_RTC_i_1_108:
+_Read_Bytes_From_DS1307_RTC_i_1_123:
 	.ds 2
 _Set_DS1307_RTC_Time_PARM_2:
 	.ds 1
@@ -578,13 +597,16 @@ __sdcc_program_startup:
 ;--------------------------------------------------------
 	.area CSEG    (CODE)
 ;------------------------------------------------------------
-;Allocation info for local variables in function 'InitGLCDEnvironment'
+;Allocation info for local variables in function 'delayms'
 ;------------------------------------------------------------
-;	src/glcd.c:8: void InitGLCDEnvironment( void ){
+;dl                        Allocated to registers 
+;iCnt                      Allocated to registers r4 r5 
+;------------------------------------------------------------
+;	src/libdelay.c:5: void delayms( int dl ){
 ;	-----------------------------------------
-;	 function InitGLCDEnvironment
+;	 function delayms
 ;	-----------------------------------------
-_InitGLCDEnvironment:
+_delayms:
 	ar7 = 0x07
 	ar6 = 0x06
 	ar5 = 0x05
@@ -593,6 +615,41 @@ _InitGLCDEnvironment:
 	ar2 = 0x02
 	ar1 = 0x01
 	ar0 = 0x00
+	mov	r6,dpl
+	mov	r7,dph
+;	src/libdelay.c:6: int iCnt=0;
+00107$:
+;	src/libdelay.c:7: for ( ; dl ; dl-- )
+	mov	a,r6
+	orl	a,r7
+	jz	00109$
+;	src/libdelay.c:8: for( iCnt=0; iCnt<=100; iCnt++);
+	mov	r4,#0x65
+	mov	r5,#0x00
+00105$:
+	dec	r4
+	cjne	r4,#0xFF,00126$
+	dec	r5
+00126$:
+	mov	a,r4
+	orl	a,r5
+	jnz	00105$
+;	src/libdelay.c:7: for ( ; dl ; dl-- )
+	dec	r6
+	cjne	r6,#0xFF,00128$
+	dec	r7
+00128$:
+	sjmp	00107$
+00109$:
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'InitGLCDEnvironment'
+;------------------------------------------------------------
+;	src/glcd.c:8: void InitGLCDEnvironment( void ){
+;	-----------------------------------------
+;	 function InitGLCDEnvironment
+;	-----------------------------------------
+_InitGLCDEnvironment:
 ;	src/glcd.c:9: RST=0;
 	clr	_P1_2
 ;	src/glcd.c:10: RST=1;	//reset low then high.
@@ -1056,36 +1113,36 @@ _writeLetter:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'printNumber'
 ;------------------------------------------------------------
-;lNumber                   Allocated with name '_printNumber_lNumber_1_40'
-;cChar                     Allocated with name '_printNumber_cChar_1_41'
-;cInteger                  Allocated with name '_printNumber_cInteger_1_41'
+;lNumber                   Allocated with name '_printNumber_lNumber_1_44'
+;cChar                     Allocated with name '_printNumber_cChar_1_45'
+;cInteger                  Allocated with name '_printNumber_cInteger_1_45'
 ;------------------------------------------------------------
 ;	src/glcd.c:100: void printNumber( long lNumber){
 ;	-----------------------------------------
 ;	 function printNumber
 ;	-----------------------------------------
 _printNumber:
-	mov	_printNumber_lNumber_1_40,dpl
-	mov	(_printNumber_lNumber_1_40 + 1),dph
-	mov	(_printNumber_lNumber_1_40 + 2),b
-	mov	(_printNumber_lNumber_1_40 + 3),a
+	mov	_printNumber_lNumber_1_44,dpl
+	mov	(_printNumber_lNumber_1_44 + 1),dph
+	mov	(_printNumber_lNumber_1_44 + 2),b
+	mov	(_printNumber_lNumber_1_44 + 3),a
 ;	src/glcd.c:102: char cInteger[10] = { 0 };
-	mov	_printNumber_cInteger_1_41,#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0001),#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0002),#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0003),#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0004),#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0005),#0x00
-	mov	(_printNumber_cInteger_1_41 + 0x0006),#0x00
+	mov	_printNumber_cInteger_1_45,#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0001),#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0002),#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0003),#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0004),#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0005),#0x00
+	mov	(_printNumber_cInteger_1_45 + 0x0006),#0x00
 ;	src/glcd.c:104: if( lNumber == 0)
 	clr	a
-	mov	(_printNumber_cInteger_1_41 + 0x0007),a
-	mov	(_printNumber_cInteger_1_41 + 0x0008),a
-	mov	(_printNumber_cInteger_1_41 + 0x0009),a
-	mov	a,_printNumber_lNumber_1_40
-	orl	a,(_printNumber_lNumber_1_40 + 1)
-	orl	a,(_printNumber_lNumber_1_40 + 2)
-	orl	a,(_printNumber_lNumber_1_40 + 3)
+	mov	(_printNumber_cInteger_1_45 + 0x0007),a
+	mov	(_printNumber_cInteger_1_45 + 0x0008),a
+	mov	(_printNumber_cInteger_1_45 + 0x0009),a
+	mov	a,_printNumber_lNumber_1_44
+	orl	a,(_printNumber_lNumber_1_44 + 1)
+	orl	a,(_printNumber_lNumber_1_44 + 2)
+	orl	a,(_printNumber_lNumber_1_44 + 3)
 ;	src/glcd.c:106: printDigit( 0 );
 	jnz	00115$
 	mov	dpl,a
@@ -1093,36 +1150,36 @@ _printNumber:
 	ljmp	_printDigit
 ;	src/glcd.c:111: while( lNumber > 0){
 00115$:
-	mov	_printNumber_cChar_1_41,#0x00
+	mov	_printNumber_cChar_1_45,#0x00
 00101$:
 	clr	c
 	clr	a
-	subb	a,_printNumber_lNumber_1_40
+	subb	a,_printNumber_lNumber_1_44
 	clr	a
-	subb	a,(_printNumber_lNumber_1_40 + 1)
+	subb	a,(_printNumber_lNumber_1_44 + 1)
 	clr	a
-	subb	a,(_printNumber_lNumber_1_40 + 2)
+	subb	a,(_printNumber_lNumber_1_44 + 2)
 	clr	a
 	xrl	a,#0x80
-	mov	b,(_printNumber_lNumber_1_40 + 3)
+	mov	b,(_printNumber_lNumber_1_44 + 3)
 	xrl	b,#0x80
 	subb	a,b
 	jnc	00103$
 ;	src/glcd.c:112: cInteger[cChar++]=( lNumber%10) ;
-	mov	r2,_printNumber_cChar_1_41
-	inc	_printNumber_cChar_1_41
+	mov	r2,_printNumber_cChar_1_45
+	inc	_printNumber_cChar_1_45
 	mov	a,r2
-	add	a,#_printNumber_cInteger_1_41
+	add	a,#_printNumber_cInteger_1_45
 	mov	r1,a
 	mov	__modslong_PARM_2,#0x0A
 	clr	a
 	mov	(__modslong_PARM_2 + 1),a
 	mov	(__modslong_PARM_2 + 2),a
 	mov	(__modslong_PARM_2 + 3),a
-	mov	dpl,_printNumber_lNumber_1_40
-	mov	dph,(_printNumber_lNumber_1_40 + 1)
-	mov	b,(_printNumber_lNumber_1_40 + 2)
-	mov	a,(_printNumber_lNumber_1_40 + 3)
+	mov	dpl,_printNumber_lNumber_1_44
+	mov	dph,(_printNumber_lNumber_1_44 + 1)
+	mov	b,(_printNumber_lNumber_1_44 + 2)
+	mov	a,(_printNumber_lNumber_1_44 + 3)
 	push	ar1
 	lcall	__modslong
 	mov	r2,dpl
@@ -1134,19 +1191,19 @@ _printNumber:
 	mov	(__divslong_PARM_2 + 1),a
 	mov	(__divslong_PARM_2 + 2),a
 	mov	(__divslong_PARM_2 + 3),a
-	mov	dpl,_printNumber_lNumber_1_40
-	mov	dph,(_printNumber_lNumber_1_40 + 1)
-	mov	b,(_printNumber_lNumber_1_40 + 2)
-	mov	a,(_printNumber_lNumber_1_40 + 3)
+	mov	dpl,_printNumber_lNumber_1_44
+	mov	dph,(_printNumber_lNumber_1_44 + 1)
+	mov	b,(_printNumber_lNumber_1_44 + 2)
+	mov	a,(_printNumber_lNumber_1_44 + 3)
 	lcall	__divslong
-	mov	_printNumber_lNumber_1_40,dpl
-	mov	(_printNumber_lNumber_1_40 + 1),dph
-	mov	(_printNumber_lNumber_1_40 + 2),b
-	mov	(_printNumber_lNumber_1_40 + 3),a
+	mov	_printNumber_lNumber_1_44,dpl
+	mov	(_printNumber_lNumber_1_44 + 1),dph
+	mov	(_printNumber_lNumber_1_44 + 2),b
+	mov	(_printNumber_lNumber_1_44 + 3),a
 	sjmp	00101$
 00103$:
 ;	src/glcd.c:115: for( --cChar; cChar>= 0 ; cChar--){
-	mov	a,_printNumber_cChar_1_41
+	mov	a,_printNumber_cChar_1_45
 	dec	a
 	mov	r7,a
 00109$:
@@ -1159,7 +1216,7 @@ _printNumber:
 	pop	ar7
 ;	src/glcd.c:117: printDigit( cInteger[cChar] );			
 	mov	a,r7
-	add	a,#_printNumber_cInteger_1_41
+	add	a,#_printNumber_cInteger_1_45
 	mov	r1,a
 	mov	dpl,@r1
 	push	ar7
@@ -1185,17 +1242,19 @@ _printNumber:
 ;	-----------------------------------------
 _setGLCDCursor:
 	mov	r6,dpl
-;	src/glcd.c:126: if( x>=0 && x<8 ){
+;	src/glcd.c:126: if( x>=0 && x<=63 ){
 	mov	a,dph
 	mov	r7,a
 	jb	acc.7,00105$
 	clr	c
-	mov	a,r6
-	subb	a,#0x08
-	mov	a,r7
+	mov	a,#0x3F
+	subb	a,r6
+	clr	a
 	xrl	a,#0x80
-	subb	a,#0x80
-	jnc	00105$
+	mov	b,r7
+	xrl	b,#0x80
+	subb	a,b
+	jc	00105$
 ;	src/glcd.c:127: chipSelectGLCD( 1 );
 	mov	dpl,#0x01
 	push	ar7
@@ -1218,9 +1277,9 @@ _setGLCDCursor:
 	mov	_commandGLCD_PARM_2,#0x01
 	ljmp	_commandGLCD
 00105$:
-;	src/glcd.c:131: else if ( x>7 && x <16 ){
+;	src/glcd.c:131: else if ( x>63 && x <128 ){
 	clr	c
-	mov	a,#0x07
+	mov	a,#0x3F
 	subb	a,r6
 	clr	a
 	xrl	a,#0x80
@@ -1230,7 +1289,7 @@ _setGLCDCursor:
 	jnc	00108$
 	clr	c
 	mov	a,r6
-	subb	a,#0x10
+	subb	a,#0x80
 	mov	a,r7
 	xrl	a,#0x80
 	subb	a,#0x80
@@ -1249,9 +1308,9 @@ _setGLCDCursor:
 	lcall	_commandGLCD
 	pop	ar6
 	pop	ar7
-;	src/glcd.c:134: commandGLCD( COLUMN_ADDRESS + x, 2 );	//column base address.
-	mov	a,#0x40
-	add	a,r6
+;	src/glcd.c:134: commandGLCD( COLUMN_ADDRESS + (x - 63), 2 );	//column base address.
+	mov	a,r6
+	inc	a
 	mov	dpl,a
 	mov	_commandGLCD_PARM_2,#0x02
 	ljmp	_commandGLCD
@@ -1261,107 +1320,421 @@ _setGLCDCursor:
 ;Allocation info for local variables in function 'splashImage'
 ;------------------------------------------------------------
 ;i                         Allocated to registers r4 
-;pg                        Allocated to registers r7 
+;pg                        Allocated to registers r5 
+;j                         Allocated to registers r6 r7 
 ;------------------------------------------------------------
-;	src/glcd.c:138: void splashImage( ){
+;	src/glcd.c:139: void splashImage( ){
 ;	-----------------------------------------
 ;	 function splashImage
 ;	-----------------------------------------
 _splashImage:
-;	src/glcd.c:141: for(pg=0;pg<8;pg++)
+;	src/glcd.c:141: int j=0;
+	mov	r6,#0x00
 	mov	r7,#0x00
-00108$:
-;	src/glcd.c:143: setGLCDCursor( 0, pg );
-	mov	_setGLCDCursor_PARM_2,r7
+;	src/glcd.c:142: chipSelectGLCD( 1 );
+	mov	dpl,#0x01
+	push	ar7
+	push	ar6
+	lcall	_chipSelectGLCD
+;	src/glcd.c:143: setGLCDCursor( 0, 0 );
+	clr	a
+	mov	_setGLCDCursor_PARM_2,a
+	mov	(_setGLCDCursor_PARM_2 + 1),a
+	mov	dpl,a
+	mov	dph,a
+	lcall	_setGLCDCursor
+	pop	ar6
+	pop	ar7
+;	src/glcd.c:144: for(pg=0;pg<2;pg++)
+	mov	r5,#0x00
+;	src/glcd.c:146: for(i=0;i<128;i++)
+00120$:
+	mov	r4,#0x00
+	mov	ar2,r6
+	mov	ar3,r7
+00109$:
+;	src/glcd.c:149: DisplayGLCD(welcomeScreenImage[j]);	
+	mov	a,r2
+	add	a,#_welcomeScreenImage
+	mov	dpl,a
+	mov	a,r3
+	addc	a,#(_welcomeScreenImage >> 8)
+	mov	dph,a
+	clr	a
+	movc	a,@a+dptr
+	mov	dpl,a
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	lcall	_DisplayGLCD
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+;	src/glcd.c:150: j++;
+	inc	r2
+	cjne	r2,#0x00,00150$
+	inc	r3
+00150$:
+;	src/glcd.c:151: if( i >= 63 ){
+	cjne	r4,#0x3F,00151$
+00151$:
+	jc	00110$
+;	src/glcd.c:153: setGLCDCursor( i, pg );
+	mov	ar0,r4
+	mov	r1,#0x00
+	mov	_setGLCDCursor_PARM_2,r5
+	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
+	mov	dpl,r0
+	mov	dph,r1
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	lcall	_setGLCDCursor
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+00110$:
+;	src/glcd.c:146: for(i=0;i<128;i++)
+	inc	r4
+	cjne	r4,#0x80,00153$
+00153$:
+	jc	00109$
+;	src/glcd.c:156: chipSelectGLCD ( 1 );
+	mov	ar6,r2
+	mov	ar7,r3
+	mov	dpl,#0x01
+	push	ar7
+	push	ar6
+	push	ar5
+	lcall	_chipSelectGLCD
+	pop	ar5
+;	src/glcd.c:157: setGLCDCursor( 0, pg + 1 );		
+	mov	ar3,r5
+	mov	r4,#0x00
+	mov	a,#0x01
+	add	a,r3
+	mov	_setGLCDCursor_PARM_2,a
+	clr	a
+	addc	a,r4
+	mov	(_setGLCDCursor_PARM_2 + 1),a
+	mov	dptr,#0x0000
+	push	ar5
+	lcall	_setGLCDCursor
+	pop	ar5
+	pop	ar6
+	pop	ar7
+;	src/glcd.c:144: for(pg=0;pg<2;pg++)
+	inc	r5
+	cjne	r5,#0x02,00155$
+00155$:
+	jnc	00156$
+	ljmp	00120$
+00156$:
+;	src/glcd.c:161: chipSelectGLCD( 1 );
+	mov	dpl,#0x01
+	lcall	_chipSelectGLCD
+;	src/glcd.c:162: setGLCDCursor( 0, 4);
+	mov	_setGLCDCursor_PARM_2,#0x04
 	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
 	mov	dptr,#0x0000
-	push	ar7
 	lcall	_setGLCDCursor
-	pop	ar7
-;	src/glcd.c:144: for(i=0;i<=63;i++)
-	mov	a,r7
-	mov	b,#0x80
-	mul	ab
-	add	a,#_welcomeScreenImage
-	mov	r5,a
-	mov	a,#(_welcomeScreenImage >> 8)
-	addc	a,b
-	mov	r6,a
+;	src/glcd.c:164: j = 0;
+	mov	r6,#0x00
+	mov	r7,#0x00
+;	src/glcd.c:165: for(pg=4;pg<7;pg++)
+	mov	r5,#0x04
+;	src/glcd.c:167: for(i=0;i<128;i++)
+00125$:
 	mov	r4,#0x00
-00104$:
-;	src/glcd.c:146: DisplayGLCD(welcomeScreenImage[pg][i]);	
-	mov	a,r4
-	add	a,r5
+	mov	ar2,r6
+	mov	ar3,r7
+00113$:
+;	src/glcd.c:170: DisplayGLCD(nameLogo[j]);	
+	mov	a,r2
+	add	a,#_nameLogo
 	mov	dpl,a
-	clr	a
-	addc	a,r6
+	mov	a,r3
+	addc	a,#(_nameLogo >> 8)
 	mov	dph,a
 	clr	a
 	movc	a,@a+dptr
 	mov	dpl,a
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	lcall	_DisplayGLCD
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+;	src/glcd.c:171: j++;
+	inc	r2
+	cjne	r2,#0x00,00157$
+	inc	r3
+00157$:
+;	src/glcd.c:172: if( i >= 63 ){
+	cjne	r4,#0x3F,00158$
+00158$:
+	jc	00114$
+;	src/glcd.c:174: setGLCDCursor( i, pg );
+	mov	ar0,r4
+	mov	r1,#0x00
+	mov	_setGLCDCursor_PARM_2,r5
+	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
+	mov	dpl,r0
+	mov	dph,r1
+	push	ar5
+	push	ar4
+	push	ar3
+	push	ar2
+	lcall	_setGLCDCursor
+	pop	ar2
+	pop	ar3
+	pop	ar4
+	pop	ar5
+00114$:
+;	src/glcd.c:167: for(i=0;i<128;i++)
+	inc	r4
+	cjne	r4,#0x80,00160$
+00160$:
+	jc	00113$
+;	src/glcd.c:177: chipSelectGLCD ( 1 );
+	mov	ar6,r2
+	mov	ar7,r3
+	mov	dpl,#0x01
 	push	ar7
 	push	ar6
 	push	ar5
-	push	ar4
-	lcall	_DisplayGLCD
-	pop	ar4
+	lcall	_chipSelectGLCD
+	pop	ar5
+;	src/glcd.c:178: setGLCDCursor( 0, pg + 1 );		
+	mov	ar3,r5
+	mov	r4,#0x00
+	mov	a,#0x01
+	add	a,r3
+	mov	_setGLCDCursor_PARM_2,a
+	clr	a
+	addc	a,r4
+	mov	(_setGLCDCursor_PARM_2 + 1),a
+	mov	dptr,#0x0000
+	push	ar5
+	lcall	_setGLCDCursor
 	pop	ar5
 	pop	ar6
 	pop	ar7
-;	src/glcd.c:144: for(i=0;i<=63;i++)
-	inc	r4
+;	src/glcd.c:165: for(pg=4;pg<7;pg++)
+	inc	r5
+	cjne	r5,#0x07,00162$
+00162$:
+	jnc	00163$
+	ljmp	00125$
+00163$:
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'borders'
+;------------------------------------------------------------
+;x                         Allocated with name '_borders_PARM_2'
+;y                         Allocated with name '_borders_PARM_3'
+;len                       Allocated with name '_borders_PARM_4'
+;ch                        Allocated to registers r7 
+;i                         Allocated to registers r7 
+;bolType                   Allocated to registers r6 
+;------------------------------------------------------------
+;	src/glcd.c:182: void borders (char ch, int x, int y, int len){
+;	-----------------------------------------
+;	 function borders
+;	-----------------------------------------
+_borders:
+	mov	r7,dpl
+;	src/glcd.c:184: unsigned char i, bolType = 0;
+	mov	r6,#0x00
+;	src/glcd.c:185: switch ( ch ){
+	cjne	r7,#0x31,00111$
+;	src/glcd.c:188: chipSelectGLCD( 1 );
+	mov	dpl,#0x01
+	push	ar6
+	lcall	_chipSelectGLCD
+;	src/glcd.c:189: setGLCDCursor( x, y );
+	mov	_setGLCDCursor_PARM_2,_borders_PARM_3
+	mov	(_setGLCDCursor_PARM_2 + 1),(_borders_PARM_3 + 1)
+	mov	dpl,_borders_PARM_2
+	mov	dph,(_borders_PARM_2 + 1)
+	lcall	_setGLCDCursor
+	pop	ar6
+;	src/glcd.c:190: for( i=0 ; i <  len ; i ++ ){
+	mov	r7,#0x00
+00109$:
+	mov	ar4,r7
+	mov	r5,#0x00
+	clr	c
 	mov	a,r4
-	add	a,#0xff - 0x3F
-	jnc	00104$
-;	src/glcd.c:148: setGLCDCursor( 8, pg );
-	mov	_setGLCDCursor_PARM_2,r7
-	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
-	mov	dptr,#0x0008
+	subb	a,_borders_PARM_4
+	mov	a,r5
+	xrl	a,#0x80
+	mov	b,(_borders_PARM_4 + 1)
+	xrl	b,#0x80
+	subb	a,b
+	jnc	00111$
+;	src/glcd.c:191: if ( i >= 63 ){
+	cjne	r7,#0x3F,00132$
+00132$:
+	jc	00105$
+;	src/glcd.c:192: chipSelectGLCD( 2 );
+	mov	dpl,#0x02
+	push	ar7
+	push	ar6
+	lcall	_chipSelectGLCD
+	pop	ar6
+	pop	ar7
+;	src/glcd.c:193: if( bolType == 0 ){
+	mov	a,r6
+	jnz	00105$
+;	src/glcd.c:194: setGLCDCursor( 64, y );
+	mov	_setGLCDCursor_PARM_2,_borders_PARM_3
+	mov	(_setGLCDCursor_PARM_2 + 1),(_borders_PARM_3 + 1)
+	mov	dptr,#0x0040
 	push	ar7
 	lcall	_setGLCDCursor
 	pop	ar7
-;	src/glcd.c:149: for(i=64;i<128;i++)
-	mov	a,r7
-	mov	b,#0x80
-	mul	ab
-	add	a,#_welcomeScreenImage
-	mov	r5,a
-	mov	a,#(_welcomeScreenImage >> 8)
-	addc	a,b
-	mov	r6,a
-	mov	r4,#0x40
-00106$:
-;	src/glcd.c:151: DisplayGLCD(welcomeScreenImage[pg][i]);	
-	mov	a,r4
-	add	a,r5
-	mov	dpl,a
-	clr	a
-	addc	a,r6
-	mov	dph,a
+;	src/glcd.c:195: bolType = 1;
+	mov	r6,#0x01
+00105$:
+;	src/glcd.c:199: DisplayGLCD( upperLine[0] );					
+	mov	dptr,#_upperLine
 	clr	a
 	movc	a,@a+dptr
 	mov	dpl,a
 	push	ar7
 	push	ar6
-	push	ar5
-	push	ar4
 	lcall	_DisplayGLCD
-	pop	ar4
+	pop	ar6
+	pop	ar7
+;	src/glcd.c:190: for( i=0 ; i <  len ; i ++ ){
+	inc	r7
+;	src/glcd.c:202: }
+	sjmp	00109$
+00111$:
+	ret
+;------------------------------------------------------------
+;Allocation info for local variables in function 'showGLCDTime'
+;------------------------------------------------------------
+;i                         Allocated to registers r5 
+;col                       Allocated to registers r6 r7 
+;------------------------------------------------------------
+;	src/glcd.c:220: void showGLCDTime( ){
+;	-----------------------------------------
+;	 function showGLCDTime
+;	-----------------------------------------
+_showGLCDTime:
+;	src/glcd.c:224: chipSelectGLCD( 1 );
+	mov	dpl,#0x01
+	lcall	_chipSelectGLCD
+;	src/glcd.c:225: setGLCDCursor( 0, 0);
+	clr	a
+	mov	_setGLCDCursor_PARM_2,a
+	mov	(_setGLCDCursor_PARM_2 + 1),a
+	mov	dpl,a
+	mov	dph,a
+	lcall	_setGLCDCursor
+;	src/glcd.c:226: for( i = 0; i <=128 ; i ++){
+	mov	r6,#0x00
+	mov	r7,#0x00
+	mov	r5,#0x00
+00107$:
+;	src/glcd.c:227: DisplayGLCD(largeLcdChar_Zero[i]);
+	mov	a,r5
+	mov	dptr,#_largeLcdChar_Zero
+	movc	a,@a+dptr
+	mov	dpl,a
+	push	ar7
+	push	ar6
+	push	ar5
+	lcall	_DisplayGLCD
 	pop	ar5
 	pop	ar6
 	pop	ar7
-;	src/glcd.c:149: for(i=64;i<128;i++)
-	inc	r4
-	cjne	r4,#0x80,00131$
-00131$:
-	jc	00106$
-;	src/glcd.c:141: for(pg=0;pg<8;pg++)
+;	src/glcd.c:228: if( i % 26 == 0){
+	mov	b,#0x1A
+	mov	a,r5
+	div	ab
+	mov	a,b
+	jnz	00108$
+;	src/glcd.c:229: setGLCDCursor( 0 , ++col);
+	inc	r6
+	cjne	r6,#0x00,00131$
 	inc	r7
-	cjne	r7,#0x08,00133$
-00133$:
-	jnc	00134$
-	ljmp	00108$
+00131$:
+	mov	_setGLCDCursor_PARM_2,r6
+	mov	(_setGLCDCursor_PARM_2 + 1),r7
+	mov	dptr,#0x0000
+	push	ar7
+	push	ar6
+	push	ar5
+	lcall	_setGLCDCursor
+	pop	ar5
+	pop	ar6
+	pop	ar7
+00108$:
+;	src/glcd.c:226: for( i = 0; i <=128 ; i ++){
+	inc	r5
+	mov	a,r5
+	add	a,#0xff - 0x80
+	jnc	00107$
+;	src/glcd.c:232: setGLCDCursor( 26, 0 );
+	clr	a
+	mov	_setGLCDCursor_PARM_2,a
+	mov	(_setGLCDCursor_PARM_2 + 1),a
+	mov	dptr,#0x001A
+	lcall	_setGLCDCursor
+;	src/glcd.c:234: for( i = 0; i <=128 ; i ++){
+	mov	r6,#0x00
+	mov	r7,#0x00
+	mov	r5,#0x00
+00109$:
+;	src/glcd.c:235: DisplayGLCD(largeLcdChar_Zero[i]);
+	mov	a,r5
+	mov	dptr,#_largeLcdChar_Zero
+	movc	a,@a+dptr
+	mov	dpl,a
+	push	ar7
+	push	ar6
+	push	ar5
+	lcall	_DisplayGLCD
+	pop	ar5
+	pop	ar6
+	pop	ar7
+;	src/glcd.c:236: if( i % 26 == 0){
+	mov	b,#0x1A
+	mov	a,r5
+	div	ab
+	mov	a,b
+	jnz	00110$
+;	src/glcd.c:237: setGLCDCursor( 26 , ++col);
+	inc	r6
+	cjne	r6,#0x00,00134$
+	inc	r7
 00134$:
+	mov	_setGLCDCursor_PARM_2,r6
+	mov	(_setGLCDCursor_PARM_2 + 1),r7
+	mov	dptr,#0x001A
+	push	ar7
+	push	ar6
+	push	ar5
+	lcall	_setGLCDCursor
+	pop	ar5
+	pop	ar6
+	pop	ar7
+00110$:
+;	src/glcd.c:234: for( i = 0; i <=128 ; i ++){
+	inc	r5
+	mov	a,r5
+	add	a,#0xff - 0x80
+	jnc	00109$
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'beginScreen'
@@ -1377,44 +1750,6 @@ _beginScreen:
 	lcall	_clearGLCD
 ;	src/screen.c:12: return 1;
 	mov	dptr,#0x0001
-	ret
-;------------------------------------------------------------
-;Allocation info for local variables in function 'delayms'
-;------------------------------------------------------------
-;dl                        Allocated to registers 
-;iCnt                      Allocated to registers r4 r5 
-;------------------------------------------------------------
-;	src/libdelay.c:5: void delayms( int dl ){
-;	-----------------------------------------
-;	 function delayms
-;	-----------------------------------------
-_delayms:
-	mov	r6,dpl
-	mov	r7,dph
-;	src/libdelay.c:6: int iCnt=0;
-00107$:
-;	src/libdelay.c:7: for ( ; dl ; dl-- )
-	mov	a,r6
-	orl	a,r7
-	jz	00109$
-;	src/libdelay.c:8: for( iCnt=0; iCnt<=100; iCnt++);
-	mov	r4,#0x65
-	mov	r5,#0x00
-00105$:
-	dec	r4
-	cjne	r4,#0xFF,00126$
-	dec	r5
-00126$:
-	mov	a,r4
-	orl	a,r5
-	jnz	00105$
-;	src/libdelay.c:7: for ( ; dl ; dl-- )
-	dec	r6
-	cjne	r6,#0xFF,00128$
-	dec	r7
-00128$:
-	sjmp	00107$
-00109$:
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function '__delay_us'
@@ -1944,7 +2279,7 @@ _Write_Bytes_To_DS1307_RTC:
 ;pData                     Allocated with name '_Read_Bytes_From_DS1307_RTC_PARM_2'
 ;NoOfBytes                 Allocated with name '_Read_Bytes_From_DS1307_RTC_PARM_3'
 ;Address                   Allocated to registers r7 
-;i                         Allocated with name '_Read_Bytes_From_DS1307_RTC_i_1_108'
+;i                         Allocated with name '_Read_Bytes_From_DS1307_RTC_i_1_123'
 ;------------------------------------------------------------
 ;	src/DS1307.c:96: void Read_Bytes_From_DS1307_RTC(unsigned char Address, unsigned char* pData, unsigned int NoOfBytes)
 ;	-----------------------------------------
@@ -1999,13 +2334,13 @@ _Read_Bytes_From_DS1307_RTC:
 	mov	a,r4
 	lcall	__gptrput
 ;	src/DS1307.c:114: for(i=1;i<NoOfBytes;i++)							// Read NoOfBytes
-	mov	_Read_Bytes_From_DS1307_RTC_i_1_108,#0x01
-	mov	(_Read_Bytes_From_DS1307_RTC_i_1_108 + 1),#0x00
+	mov	_Read_Bytes_From_DS1307_RTC_i_1_123,#0x01
+	mov	(_Read_Bytes_From_DS1307_RTC_i_1_123 + 1),#0x00
 00106$:
 	clr	c
-	mov	a,_Read_Bytes_From_DS1307_RTC_i_1_108
+	mov	a,_Read_Bytes_From_DS1307_RTC_i_1_123
 	subb	a,_Read_Bytes_From_DS1307_RTC_PARM_3
-	mov	a,(_Read_Bytes_From_DS1307_RTC_i_1_108 + 1)
+	mov	a,(_Read_Bytes_From_DS1307_RTC_i_1_123 + 1)
 	subb	a,(_Read_Bytes_From_DS1307_RTC_PARM_3 + 1)
 	jnc	00104$
 ;	src/DS1307.c:116: I2C_Send_ACK();					// Give Ack to slave to start receiving next byte
@@ -2017,10 +2352,10 @@ _Read_Bytes_From_DS1307_RTC:
 	pop	ar6
 	pop	ar7
 ;	src/DS1307.c:117: pData[i] = I2C_Read_Byte();		// Read next byte from EEPROM
-	mov	a,_Read_Bytes_From_DS1307_RTC_i_1_108
+	mov	a,_Read_Bytes_From_DS1307_RTC_i_1_123
 	add	a,r5
 	mov	r0,a
-	mov	a,(_Read_Bytes_From_DS1307_RTC_i_1_108 + 1)
+	mov	a,(_Read_Bytes_From_DS1307_RTC_i_1_123 + 1)
 	addc	a,r6
 	mov	r1,a
 	mov	ar2,r7
@@ -2044,10 +2379,10 @@ _Read_Bytes_From_DS1307_RTC:
 	mov	a,r4
 	lcall	__gptrput
 ;	src/DS1307.c:114: for(i=1;i<NoOfBytes;i++)							// Read NoOfBytes
-	inc	_Read_Bytes_From_DS1307_RTC_i_1_108
+	inc	_Read_Bytes_From_DS1307_RTC_i_1_123
 	clr	a
-	cjne	a,_Read_Bytes_From_DS1307_RTC_i_1_108,00106$
-	inc	(_Read_Bytes_From_DS1307_RTC_i_1_108 + 1)
+	cjne	a,_Read_Bytes_From_DS1307_RTC_i_1_123,00106$
+	inc	(_Read_Bytes_From_DS1307_RTC_i_1_123 + 1)
 	sjmp	00106$
 00104$:
 ;	src/DS1307.c:122: I2C_Send_NACK();
@@ -2390,429 +2725,32 @@ _main:
 00102$:
 ;	src/main.c:33: splashImage();
 	lcall	_splashImage
-;	src/main.c:36: delayms( 1000 );
-	mov	dptr,#0x03E8
+;	src/main.c:36: borders( '1', 0, 2, 127);				//draw borders of the screen
+	clr	a
+	mov	_borders_PARM_2,a
+	mov	(_borders_PARM_2 + 1),a
+	mov	_borders_PARM_3,#0x02
+	mov	(_borders_PARM_3 + 1),#0x00
+	mov	_borders_PARM_4,#0x7F
+	mov	(_borders_PARM_4 + 1),#0x00
+	mov	dpl,#0x31
+	lcall	_borders
+;	src/main.c:37: delayms( 3000 );
+	mov	dptr,#0x0BB8
 	lcall	_delayms
 ;	src/main.c:39: clearGLCD();
 	lcall	_clearGLCD
-;	src/main.c:41: setGLCDCursor( 1, 1);
-	mov	_setGLCDCursor_PARM_2,#0x01
-	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
-	mov	dptr,#0x0001
-	lcall	_setGLCDCursor
-;	src/main.c:43: writeLine( "Detecting clock." );
-	mov	dptr,#__str_0
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:47: delayms( 1000 );
-	mov	dptr,#0x03E8
-	lcall	_delayms
-;	src/main.c:49: Set_DS1307_RTC_Time(PM_Time, 17, 15, 59);	
-	mov	_Set_DS1307_RTC_Time_PARM_2,#0x11
-	mov	_Set_DS1307_RTC_Time_PARM_3,#0x0F
-	mov	_Set_DS1307_RTC_Time_PARM_4,#0x3B
-	mov	dpl,#0x01
-	lcall	_Set_DS1307_RTC_Time
-;	src/main.c:52: Set_DS1307_RTC_Date(1, 12, 13, Friday); 	
-	mov	_Set_DS1307_RTC_Date_PARM_2,#0x0C
-	mov	_Set_DS1307_RTC_Date_PARM_3,#0x0D
-	mov	_Set_DS1307_RTC_Date_PARM_4,#0x05
-	mov	dpl,#0x01
-	lcall	_Set_DS1307_RTC_Date
-;	src/main.c:53: clearGLCD();
-	lcall	_clearGLCD
-;	src/main.c:54: setGLCDCursor( 1, 2);
-	mov	_setGLCDCursor_PARM_2,#0x02
-	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
-	mov	dptr,#0x0001
-	lcall	_setGLCDCursor
-;	src/main.c:55: writeLine("In loop now.");
-	mov	dptr,#__str_1
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:56: delayms( 2000 );
-	mov	dptr,#0x07D0
-	lcall	_delayms
-;	src/main.c:58: while( 1 ){
+;	src/main.c:40: showGLCDTime();			//from glcd lib.
+	lcall	_showGLCDTime
+;	src/main.c:61: while( 1 ){
 00104$:
-;	src/main.c:60: clearGLCD();
-	lcall	_clearGLCD
-;	src/main.c:61: setGLCDCursor( 0, 0);
-	clr	a
-	mov	_setGLCDCursor_PARM_2,a
-	mov	(_setGLCDCursor_PARM_2 + 1),a
-	mov	dpl,a
-	mov	dph,a
-	lcall	_setGLCDCursor
-;	src/main.c:62: ch_CharCatch = Get_DS1307_RTC_Time();
-	lcall	_Get_DS1307_RTC_Time
-	mov	_ch_CharCatch,dpl
-	mov	(_ch_CharCatch + 1),dph
-	mov	(_ch_CharCatch + 2),b
-;	src/main.c:63: nVar = (int) (ch_CharCatch[2]/10);
-	mov	a,#0x02
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:64: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:65: nVar = (int) (ch_CharCatch[2]%10);
-	mov	a,#0x02
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:66: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:67: writeLine( ":" );
-	mov	dptr,#__str_2
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:69: nVar = (int) (ch_CharCatch[1]/10);
-	mov	a,#0x01
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:70: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:71: nVar = (int) (ch_CharCatch[1]%10);
-	mov	a,#0x01
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:72: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:73: writeLine( ":" );
-	mov	dptr,#__str_2
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:74: nVar = (int) (ch_CharCatch[0]/10);
-	mov	r5,_ch_CharCatch
-	mov	r6,(_ch_CharCatch + 1)
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:75: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:76: nVar = (int) (ch_CharCatch[0]%10);
-	mov	r5,_ch_CharCatch
-	mov	r6,(_ch_CharCatch + 1)
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:77: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:79: setGLCDCursor( 0, 2 );
-	mov	_setGLCDCursor_PARM_2,#0x02
-	mov	(_setGLCDCursor_PARM_2 + 1),#0x00
-	mov	dptr,#0x0000
-	lcall	_setGLCDCursor
-;	src/main.c:80: ch_CharCatch = Get_DS1307_RTC_Date();
-	lcall	_Get_DS1307_RTC_Date
-	mov	_ch_CharCatch,dpl
-	mov	(_ch_CharCatch + 1),dph
-	mov	(_ch_CharCatch + 2),b
-;	src/main.c:81: nVar = (int) (ch_CharCatch[1]/10);
-	mov	a,#0x01
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:82: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:83: nVar = (int) (ch_CharCatch[1]%10);
-	mov	a,#0x01
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:84: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:85: writeLine( ":" );		
-	mov	dptr,#__str_2
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:86: nVar = (int) (ch_CharCatch[2]/10);
-	mov	a,#0x02
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:87: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:88: nVar = (int) (ch_CharCatch[2]%10);
-	mov	a,#0x02
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:89: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:90: writeLine( ":" );
-	mov	dptr,#__str_2
-	mov	b,#0x80
-	lcall	_writeLine
-;	src/main.c:91: nVar = (int) (ch_CharCatch[3]/10);
-	mov	a,#0x03
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,a
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:92: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:93: nVar = (int) (ch_CharCatch[3]%10);
-	mov	a,#0x03
-	add	a,_ch_CharCatch
-	mov	r5,a
-	clr	a
-	addc	a,(_ch_CharCatch + 1)
-	mov	r6,a
-	mov	r7,(_ch_CharCatch + 2)
-	mov	dpl,r5
-	mov	dph,r6
-	mov	b,r7
-	lcall	__gptrget
-	mov	b,#0x0A
-	div	ab
-	mov	r5,b
-	mov	_nVar,r5
-	mov	(_nVar + 1),#0x00
-;	src/main.c:94: printNumber( nVar );
-	mov	r4,_nVar
-	mov	a,(_nVar + 1)
-	mov	r5,a
-	rlc	a
-	subb	a,acc
-	mov	r6,a
-	mov	dpl,r4
-	mov	dph,r5
-	mov	b,r6
-	lcall	_printNumber
-;	src/main.c:97: delayms( 1000 );
-	mov	dptr,#0x03E8
-	lcall	_delayms
-	ljmp	00104$
+	sjmp	00104$
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'getCharLen'
 ;------------------------------------------------------------
 ;chVal                     Allocated to registers r5 r6 r7 
 ;------------------------------------------------------------
-;	src/main.c:101: int getCharLen( char * chVal ){
+;	src/main.c:105: int getCharLen( char * chVal ){
 ;	-----------------------------------------
 ;	 function getCharLen
 ;	-----------------------------------------
@@ -2820,7 +2758,7 @@ _getCharLen:
 	mov	r5,dpl
 	mov	r6,dph
 	mov	r7,b
-;	src/main.c:103: for( i = 1; chVal[i]!='\0'; i++){
+;	src/main.c:107: for( i = 1; chVal[i]!='\0'; i++){
 	mov	_i,#0x01
 	mov	(_i + 1),#0x00
 00103$:
@@ -2843,7 +2781,7 @@ _getCharLen:
 	inc	(_i + 1)
 	sjmp	00103$
 00101$:
-;	src/main.c:105: return i;
+;	src/main.c:109: return i;
 	mov	dpl,_i
 	mov	dph,(_i + 1)
 	ret
@@ -3267,655 +3205,316 @@ _welcomeScreenImage:
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xE0	; 224
-	.db #0xE0	; 224
 	.db #0xF0	; 240
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xE0	; 224
 	.db #0xF8	; 248
-	.db #0xF8	; 248
-	.db #0x7C	; 124
-	.db #0x1C	; 28
-	.db #0x1C	; 28
-	.db #0x1C	; 28
-	.db #0x1C	; 28
-	.db #0x00	; 0
-	.db #0x00	; 0
+	.db #0x98	; 152
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x70	; 112	'p'
 	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0x60	; 96
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xC0	; 192
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0x70	; 112	'p'
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xC0	; 192
 	.db #0x80	; 128
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xE0	; 224
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x1F	; 31
-	.db #0x3F	; 63
-	.db #0x3F	; 63
-	.db #0x7F	; 127
-	.db #0xF8	; 248
-	.db #0xF0	; 240
-	.db #0xF0	; 240
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xC0	; 192
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
 	.db #0x80	; 128
-	.db #0xE0	; 224
 	.db #0xF0	; 240
-	.db #0xF8	; 248
-	.db #0x7C	; 124
-	.db #0x1C	; 28
-	.db #0x1E	; 30
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x1E	; 30
-	.db #0xFE	; 254
-	.db #0xFC	; 252
-	.db #0xFC	; 252
+	.db #0x30	; 48	'0'
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0xD8	; 216
 	.db #0xF0	; 240
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x0E	; 14
-	.db #0xEE	; 238
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0x0F	; 15
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x00	; 0
-	.db #0x0E	; 14
-	.db #0xEE	; 238
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0x0F	; 15
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x0E	; 14
-	.db #0x02	; 2
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xC3	; 195
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xE0	; 224
 	.db #0xF0	; 240
-	.db #0xFF	; 255
-	.db #0x7F	; 127
-	.db #0x3F	; 63
-	.db #0x1F	; 31
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0x7F	; 127
-	.db #0x03	; 3
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0x1C	; 28
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0xE0	; 224
-	.db #0xF0	; 240
-	.db #0xFC	; 252
-	.db #0x7F	; 127
-	.db #0x1F	; 31
-	.db #0x07	; 7
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x7F	; 127
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFC	; 252
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x70	; 112	'p'
 	.db #0x78	; 120	'x'
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
 	.db #0xF0	; 240
 	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
 	.db #0xF0	; 240
-	.db #0x7F	; 127
-	.db #0x7F	; 127
-	.db #0x3F	; 63
-	.db #0x1F	; 31
-	.db #0x07	; 7
+	.db #0xF8	; 248
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0xF0	; 240
+	.db #0xF0	; 240
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x1F	; 31
-	.db #0x7F	; 127
-	.db #0x7F	; 127
-	.db #0xFF	; 255
+	.db #0x00	; 0
 	.db #0xF0	; 240
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
+	.db #0xF8	; 248
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
 	.db #0xF0	; 240
+	.db #0xF0	; 240
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xF0	; 240
+	.db #0xF8	; 248
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x38	; 56	'8'
+	.db #0x38	; 56	'8'
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x98	; 152
+	.db #0xF8	; 248
+	.db #0xF0	; 240
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xC0	; 192
+	.db #0xC0	; 192
 	.db #0x70	; 112	'p'
-	.db #0x7C	; 124
-	.db #0x3F	; 63
-	.db #0x1F	; 31
-	.db #0x0F	; 15
-	.db #0x03	; 3
+	.db #0x30	; 48	'0'
+	.db #0x30	; 48	'0'
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0x30	; 48	'0'
+	.db #0x30	; 48	'0'
+	.db #0x70	; 112	'p'
+	.db #0xF8	; 248
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0xF0	; 240
+	.db #0xF0	; 240
+	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x80	; 128
+	.db #0xC0	; 192
+	.db #0xE0	; 224
+	.db #0x30	; 48	'0'
+	.db #0x30	; 48	'0'
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0xF0	; 240
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0x30	; 48	'0'
+	.db #0x70	; 112	'p'
+	.db #0xE0	; 224
+	.db #0xC0	; 192
+	.db #0xE0	; 224
+	.db #0x30	; 48	'0'
+	.db #0x30	; 48	'0'
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0xF0	; 240
+	.db #0x10	; 16
+	.db #0x10	; 16
+	.db #0x30	; 48	'0'
+	.db #0x30	; 48	'0'
+	.db #0xF8	; 248
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0xF8	; 248
+	.db #0xF0	; 240
+	.db #0x70	; 112	'p'
+	.db #0x30	; 48	'0'
+	.db #0x18	; 24
+	.db #0x18	; 24
+	.db #0x98	; 152
+	.db #0xD8	; 216
+	.db #0xF0	; 240
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x03	; 3
+	.db #0x0F	; 15
+	.db #0xF8	; 248
+	.db #0xE0	; 224
+	.db #0x00	; 0
+	.db #0x03	; 3
+	.db #0xFF	; 255
+	.db #0x07	; 7
+	.db #0x01	; 1
+	.db #0xC1	; 193
+	.db #0x01	; 1
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x03	; 3
+	.db #0x80	; 128
+	.db #0xF0	; 240
 	.db #0xFC	; 252
 	.db #0xFF	; 255
-	.db #0xFF	; 255
 	.db #0x3F	; 63
-	.db #0x01	; 1
+	.db #0x07	; 7
 	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x88	; 136
+	.db #0x80	; 128
+	.db #0x80	; 128
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x7C	; 124
+	.db #0x07	; 7
+	.db #0x3F	; 63
 	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xE1	; 225
-	.db #0xE0	; 224
-	.db #0x60	; 96
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xE0	; 224
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0xFF	; 255
-	.db #0x0F	; 15
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x01	; 1
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xE0	; 224
-	.db #0xFF	; 255
-	.db #0xFF	; 255
 	.db #0xFF	; 255
 	.db #0xEF	; 239
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0xE0	; 224
-	.db #0x70	; 112	'p'
-	.db #0x78	; 120	'x'
-	.db #0x7C	; 124
-	.db #0x3E	; 62
-	.db #0x1F	; 31
-	.db #0x0F	; 15
-	.db #0x07	; 7
-	.db #0x01	; 1
 	.db #0xC0	; 192
-	.db #0xE0	; 224
-	.db #0xF8	; 248
-	.db #0xFE	; 254
-	.db #0x7F	; 127
-	.db #0x1F	; 31
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
-	.db #0x07	; 7
+	.db #0xC0	; 192
+	.db #0xC0	; 192
 	.db #0xFF	; 255
 	.db #0xFF	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
 	.db #0xFF	; 255
-	.db #0xFE	; 254
+	.db #0xEF	; 239
+	.db #0xC0	; 192
+	.db #0xC0	; 192
+	.db #0xC0	; 192
+	.db #0xC0	; 192
+	.db #0xE3	; 227
+	.db #0xFF	; 255
+	.db #0x0C	; 12
+	.db #0x04	; 4
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x80	; 128
+	.db #0xC0	; 192
 	.db #0xF0	; 240
-	.db #0x80	; 128
-	.db #0x80	; 128
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x30	; 48	'0'
-	.db #0x38	; 56	'8'
-	.db #0x38	; 56	'8'
-	.db #0x3C	; 60
-	.db #0x3F	; 63
-	.db #0x1F	; 31
+	.db #0x7C	; 124
 	.db #0x0F	; 15
 	.db #0x03	; 3
 	.db #0x00	; 0
 	.db #0x00	; 0
+	.db #0x1C	; 28
+	.db #0xFF	; 255
+	.db #0xC1	; 193
 	.db #0x00	; 0
 	.db #0x00	; 0
+	.db #0x1C	; 28
+	.db #0x7F	; 127
+	.db #0x63	; 99	'c'
+	.db #0x63	; 99	'c'
+	.db #0x7F	; 127
+	.db #0x1C	; 28
+	.db #0x1C	; 28
+	.db #0x3C	; 60
+	.db #0xFF	; 255
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
+	.db #0xFF	; 255
+	.db #0xEF	; 239
+	.db #0xC0	; 192
+	.db #0xC0	; 192
+	.db #0xC0	; 192
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0x80	; 128
 	.db #0x00	; 0
 	.db #0x00	; 0
+	.db #0x3E	; 62
+	.db #0x77	; 119	'w'
+	.db #0xE3	; 227
+	.db #0x77	; 119	'w'
+	.db #0x3E	; 62
 	.db #0x00	; 0
 	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0xFF	; 255
+	.db #0x80	; 128
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x10	; 16
-	.db #0x1F	; 31
-	.db #0x11	; 17
-	.db #0x10	; 16
-	.db #0x18	; 24
-	.db #0x0F	; 15
-	.db #0x00	; 0
-	.db #0x40	; 64
+	.db #0x3E	; 62
+	.db #0x77	; 119	'w'
+	.db #0xE3	; 227
 	.db #0x67	; 103	'g'
 	.db #0x3E	; 62
 	.db #0x1C	; 28
+	.db #0x1C	; 28
+	.db #0xBE	; 190
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xE1	; 225
+	.db #0xC0	; 192
+	.db #0x00	; 0
+	.db #0x0C	; 12
+	.db #0x1E	; 30
+	.db #0x77	; 119	'w'
+	.db #0xF3	; 243
+	.db #0xE1	; 225
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x03	; 3
+	.db #0x0F	; 15
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0E	; 14
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0E	; 14
 	.db #0x07	; 7
 	.db #0x01	; 1
 	.db #0x00	; 0
@@ -3924,345 +3523,692 @@ _welcomeScreenImage:
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
 	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0x80	; 128
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xC0	; 192
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xC0	; 192
-	.db #0xF0	; 240
-	.db #0x38	; 56	'8'
-	.db #0x3E	; 62
-	.db #0x33	; 51	'3'
-	.db #0x31	; 49	'1'
-	.db #0x37	; 55	'7'
-	.db #0xFF	; 255
-	.db #0xF0	; 240
-	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0xF8	; 248
-	.db #0x3E	; 62
-	.db #0x0C	; 12
+	.db #0x01	; 1
+	.db #0x03	; 3
 	.db #0x06	; 6
-	.db #0xE6	; 230
-	.db #0xFE	; 254
+	.db #0x04	; 4
+	.db #0x04	; 4
 	.db #0x0C	; 12
-	.db #0x80	; 128
-	.db #0xF8	; 248
-	.db #0x3E	; 62
 	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0E	; 14
 	.db #0x06	; 6
-	.db #0xE6	; 230
-	.db #0xFE	; 254
+	.db #0x07	; 7
+	.db #0x0F	; 15
 	.db #0x0C	; 12
-	.db #0x80	; 128
-	.db #0xFC	; 252
-	.db #0x3E	; 62
-	.db #0x00	; 0
-	.db #0x80	; 128
-	.db #0xF8	; 248
-	.db #0x3E	; 62
 	.db #0x0C	; 12
-	.db #0x06	; 6
-	.db #0xE6	; 230
-	.db #0xFE	; 254
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
 	.db #0x0C	; 12
 	.db #0x04	; 4
-	.db #0x86	; 134
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x06	; 6
+	.db #0x06	; 6
+	.db #0x04	; 4
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0E	; 14
+	.db #0x07	; 7
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x06	; 6
+	.db #0x06	; 6
+	.db #0x04	; 4
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0E	; 14
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x0F	; 15
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0F	; 15
+	.db #0x07	; 7
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+_nameLogo:
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xF0	; 240
+	.db #0x08	; 8
+	.db #0x08	; 8
+	.db #0x08	; 8
+	.db #0x08	; 8
+	.db #0xF0	; 240
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xFC	; 252
+	.db #0x8E	; 142
+	.db #0x06	; 6
+	.db #0x06	; 6
+	.db #0x8E	; 142
+	.db #0xFC	; 252
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xFC	; 252
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x0C	; 12
+	.db #0x08	; 8
+	.db #0x18	; 24
+	.db #0xF0	; 240
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
 	.db #0xFE	; 254
-	.db #0x3E	; 62
+	.db #0x06	; 6
+	.db #0x06	; 6
+	.db #0x06	; 6
+	.db #0xFC	; 252
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-	.db #0xF8	; 248
+	.db #0xFE	; 254
+	.db #0x07	; 7
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x1F	; 31
+	.db #0xF0	; 240
+	.db #0x7F	; 127
+	.db #0xC3	; 195
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x07	; 7
+	.db #0xC3	; 195
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x07	; 7
 	.db #0xFF	; 255
-	.db #0xCF	; 207
-	.db #0xCC	; 204
-	.db #0xCC	; 204
-	.db #0x7E	; 126
-	.db #0x7B	; 123
+	.db #0xC3	; 195
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x83	; 131
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x0E	; 14
+	.db #0xFE	; 254
+	.db #0xC7	; 199
+	.db #0xC7	; 199
+	.db #0x07	; 7
+	.db #0x07	; 7
+	.db #0x07	; 7
+	.db #0xFF	; 255
+	.db #0xC3	; 195
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x83	; 131
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x07	; 7
+	.db #0xFC	; 252
+	.db #0xC0	; 192
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x07	; 7
+	.db #0xFE	; 254
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x0E	; 14
+	.db #0x0E	; 14
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x20	; 32
+	.db #0x7C	; 124
+	.db #0x0F	; 15
+	.db #0x07	; 7
+	.db #0x03	; 3
+	.db #0xC3	; 195
+	.db #0x83	; 131
+	.db #0x07	; 7
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0xC3	; 195
+	.db #0xF3	; 243
+	.db #0xC3	; 195
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x83	; 131
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x0E	; 14
+	.db #0x0E	; 14
+	.db #0x07	; 7
+	.db #0x03	; 3
+	.db #0x43	; 67	'C'
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x07	; 7
+	.db #0x8F	; 143
+	.db #0xF3	; 243
+	.db #0xC3	; 195
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x83	; 131
+	.db #0x03	; 3
+	.db #0xC7	; 199
+	.db #0xFF	; 255
+	.db #0x87	; 135
+	.db #0x07	; 7
+	.db #0x07	; 7
+	.db #0x07	; 7
+	.db #0xFF	; 255
+	.db #0x0E	; 14
+	.db #0x07	; 7
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x0E	; 14
+	.db #0xFC	; 252
+	.db #0x0E	; 14
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x0E	; 14
+	.db #0xFC	; 252
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xFE	; 254
+	.db #0x87	; 135
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xFE	; 254
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x87	; 135
+	.db #0xFE	; 254
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8E	; 142
+	.db #0xDF	; 223
+	.db #0x8E	; 142
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0xFF	; 255
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xFF	; 255
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0xFF	; 255
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xFF	; 255
+	.db #0x87	; 135
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x87	; 135
+	.db #0x87	; 135
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xE0	; 224
+	.db #0xF0	; 240
+	.db #0xC0	; 192
+	.db #0x80	; 128
+	.db #0x87	; 135
+	.db #0x87	; 135
+	.db #0xC0	; 192
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x83	; 131
+	.db #0xFF	; 255
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x8F	; 143
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0xE0	; 224
+	.db #0xC0	; 192
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x84	; 132
+	.db #0x86	; 134
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0x8F	; 143
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x83	; 131
+	.db #0x8F	; 143
+	.db #0xFF	; 255
+	.db #0x03	; 3
+	.db #0xC1	; 193
+	.db #0xFF	; 255
+	.db #0x40	; 64
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xFF	; 255
+	.db #0xF0	; 240
+	.db #0xE0	; 224
+	.db #0xC0	; 192
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x06	; 6
+	.db #0xF6	; 246
+	.db #0x3F	; 63
+	.db #0xF0	; 240
+	.db #0xC0	; 192
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x80	; 128
+	.db #0x06	; 6
+	.db #0xF6	; 246
+	.db #0x3F	; 63
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
 	.db #0x01	; 1
 	.db #0x00	; 0
-	.db #0xFC	; 252
-	.db #0xCC	; 204
-	.db #0xC6	; 198
-	.db #0x46	; 70	'F'
-	.db #0xFE	; 254
-	.db #0x7E	; 126
-	.db #0x02	; 2
-	.db #0x80	; 128
-	.db #0xF8	; 248
-	.db #0x3E	; 62
-	.db #0x0C	; 12
-	.db #0x06	; 6
-	.db #0xE6	; 230
-	.db #0xFE	; 254
-	.db #0x0C	; 12
 	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0xDC	; 220
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0x4E	; 78	'N'
-	.db #0x0C	; 12
-	.db #0x80	; 128
-	.db #0xFC	; 252
-	.db #0x3E	; 62
-	.db #0x0C	; 12
-	.db #0x06	; 6
-	.db #0x06	; 6
-	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0x7E	; 126
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0xDC	; 220
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0x4E	; 78	'N'
-	.db #0x0C	; 12
-	.db #0x00	; 0
-	.db #0xF8	; 248
-	.db #0xDC	; 220
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0xD6	; 214
-	.db #0x4E	; 78	'N'
-	.db #0x0C	; 12
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x00	; 0
-	.db #0x06	; 6
-	.db #0x07	; 7
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x01	; 1
+	.db #0x3F	; 63
+	.db #0x73	; 115	's'
+	.db #0x60	; 96
+	.db #0x60	; 96
+	.db #0x60	; 96
+	.db #0x70	; 112	'p'
+	.db #0x1F	; 31
+	.db #0x01	; 1
+	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x01	; 1
+	.db #0x01	; 1
+	.db #0x03	; 3
+	.db #0x03	; 3
+	.db #0x03	; 3
 	.db #0x03	; 3
 	.db #0x00	; 0
 	.db #0x00	; 0
@@ -4288,14 +4234,242 @@ _welcomeScreenImage:
 	.db #0x00	; 0
 	.db #0x00	; 0
 	.db #0x00	; 0
-__str_0:
-	.ascii "Detecting clock."
-	.db 0x00
-__str_1:
-	.ascii "In loop now."
-	.db 0x00
-__str_2:
-	.ascii ":"
-	.db 0x00
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+_largeLcdChar_Zero:
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xC0	; 192
+	.db #0xF0	; 240
+	.db #0xF0	; 240
+	.db #0xF0	; 240
+	.db #0xF8	; 248
+	.db #0x78	; 120	'x'
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x7C	; 124
+	.db #0xF8	; 248
+	.db #0xF8	; 248
+	.db #0xF0	; 240
+	.db #0xF0	; 240
+	.db #0xE0	; 224
+	.db #0xC0	; 192
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xE0	; 224
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0x01	; 1
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x0F	; 15
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFC	; 252
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x07	; 7
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0x80	; 128
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0xF0	; 240
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0xFF	; 255
+	.db #0x1F	; 31
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x07	; 7
+	.db #0x0F	; 15
+	.db #0x0F	; 15
+	.db #0x1F	; 31
+	.db #0x1F	; 31
+	.db #0x3E	; 62
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3C	; 60
+	.db #0x3E	; 62
+	.db #0x1F	; 31
+	.db #0x1F	; 31
+	.db #0x0F	; 15
+	.db #0x0F	; 15
+	.db #0x07	; 7
+	.db #0x01	; 1
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+	.db #0x00	; 0
+_upperLine:
+	.db #0x01	; 1
+_topLeftCorner:
+	.db #0xFF	; 255
+	.db #0x01	; 1
+_Line:
+	.db #0xFF	; 255
+_topRightCorner:
+	.db #0x01	; 1
+	.db #0xFF	; 255
+_bottomRightCorner:
+	.db #0x08	; 8
+	.db #0xF0	; 240
+_bottomLeftCorner:
+	.db #0xF0	; 240
+	.db #0x08	; 8
 	.area XINIT   (CODE)
 	.area CABS    (ABS,CODE)
